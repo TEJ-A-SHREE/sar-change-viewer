@@ -30,7 +30,11 @@ non-technical person can understand.
 - Python with matplotlib for image generation.
 - GitHub with version control; teammates push their own code.
 - Start with the frontend (UI/UX) first.
-- Sentinel-1 is the obvious free SAR source; the brief does not name a mission.
+- NISAR (NASA-ISRO SAR) is the intended source but its coverage is inconsistent, so the
+  tool only lists places with verified usable scenes. Sentinel-1 is the fallback.
+- Entry screen is a game-like world map: hover highlights a continent, click opens a
+  translucent panel of verified countries, pick one to zoom in, then pick a state.
+  Visual style: techy and edgy. More sections (landing, info) come later.
 
 ## Assumptions (please confirm)
 
@@ -38,7 +42,7 @@ non-technical person can understand.
 |---|-----------|----------|
 | 1 | Web app, not desktop or notebook. | Swap `frontend/` for a Streamlit app; the backend stages stay. |
 | 2 | React + TypeScript for the UI. | Any framework works against the same contract. |
-| 3 | Sentinel-1 GRD, VV polarisation, as the first data source. | Change `source` enum in the contract. |
+| 3 | Sentinel-1 GRD, VV polarisation, as the fallback source until NISAR scenes are verified. | Add `nisar` to the `source` enum in the contract. |
 | 4 | Change detection by log-ratio with speckle filtering is an acceptable first method. | Replace `process.compute_change()`; signature unchanged. |
 | 5 | Plain-language text is rule-based for now; an LLM can be added inside `analyze.py` later. | Same signature, different implementation. |
 | 6 | Synchronous requests are fine while data is synthetic. | Job queue sketched in ARCHITECTURE "Known limits". |

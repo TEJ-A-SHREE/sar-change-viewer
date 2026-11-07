@@ -1,16 +1,19 @@
 # One-word commands for the whole team. Run `make` to list them.
 
 .DEFAULT_GOAL := help
-.PHONY: help setup frontend backend dev test lint format check contract
+.PHONY: help start setup frontend backend dev test lint format check contract
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
+
+start: ## Start everything and open the browser (same as ./start.sh)
+	./start.sh
 
 setup: ## Install everything (frontend + backend)
 	cd frontend && npm install
 	cd backend && uv sync
 
-frontend: ## Run the UI on http://localhost:5173
+frontend: ## Run the UI on http://localhost:5174
 	cd frontend && npm run dev
 
 backend: ## Run the API on http://localhost:8000

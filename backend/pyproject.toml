@@ -1,6 +1,6 @@
 [project]
 name = "sar-change-viewer-backend"
-version = "0.1.0"
+version = "0.2.0"
 description = "API that fetches satellite SAR data, renders change images and explains them in plain language."
 readme = "README.md"
 requires-python = ">=3.11"

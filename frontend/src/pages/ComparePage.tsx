@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { analyze, health, AnalysisError } from '../lib/api'
 import type { AnalysisRequest, AnalysisResult } from '../types/analysis'
 import { Header } from '../components/Header'
@@ -20,6 +21,8 @@ type State =
 export function ComparePage() {
   const [state, setState] = useState<State>({ kind: 'idle' })
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null)
+  const [params] = useSearchParams()
+  const initialRegionId = params.get('region') ?? undefined
 
   useEffect(() => {
     health().then(setBackendOnline)
@@ -42,7 +45,11 @@ export function ComparePage() {
     <div className="flex min-h-full flex-col">
       <Header backendOnline={backendOnline} />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6">
-        <QueryForm busy={state.kind === 'loading'} onSubmit={run} />
+        <QueryForm
+          busy={state.kind === 'loading'}
+          initialRegionId={initialRegionId}
+          onSubmit={run}
+        />
 
         {state.kind === 'idle' && <EmptyState />}
         {state.kind === 'loading' && <LoadingState />}

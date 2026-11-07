@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 interface Props {
   backendOnline: boolean | null
 }
@@ -22,9 +24,17 @@ export function Header({ backendOnline }: Props) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-ink-300">
-          <span className={`inline-block h-2 w-2 rounded-full ${status.dot}`} aria-hidden />
-          <span>{status.text}</span>
+        <div className="flex items-center gap-4 text-xs text-ink-300">
+          <Link
+            to="/"
+            className="font-mono uppercase tracking-widest text-signal-500 hover:underline"
+          >
+            ← Map
+          </Link>
+          <span className="flex items-center gap-2">
+            <span className={`inline-block h-2 w-2 rounded-full ${status.dot}`} aria-hidden />
+            <span>{status.text}</span>
+          </span>
         </div>
       </div>
     </header>

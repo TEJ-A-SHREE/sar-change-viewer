@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 5173,
+    port: 5174,
     // Forward /api/* to the Python backend during development so the
     // frontend never needs to know the backend host.
     proxy: {

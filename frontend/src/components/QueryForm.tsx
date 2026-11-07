@@ -4,6 +4,8 @@ import { PRESET_REGIONS } from '../lib/regions'
 
 interface Props {
   busy: boolean
+  /** Preset id (lib/regions.ts) to start with, e.g. from ?region=kerala. */
+  initialRegionId?: string
   onSubmit: (request: AnalysisRequest) => void
 }
 
@@ -11,9 +13,13 @@ const inputClass =
   'w-full rounded-md border border-space-600 bg-space-800 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500 focus:border-signal-500 focus:outline-none'
 const labelClass = 'mb-1 block text-xs font-medium uppercase tracking-wide text-ink-500'
 
-export function QueryForm({ busy, onSubmit }: Props) {
-  const [presetIndex, setPresetIndex] = useState(0)
-  const [bbox, setBbox] = useState<BBox>(PRESET_REGIONS[0].bbox)
+export function QueryForm({ busy, initialRegionId, onSubmit }: Props) {
+  const initialIndex = Math.max(
+    0,
+    PRESET_REGIONS.findIndex((r) => r.id === initialRegionId),
+  )
+  const [presetIndex, setPresetIndex] = useState(initialIndex)
+  const [bbox, setBbox] = useState<BBox>(PRESET_REGIONS[initialIndex].bbox)
   const [beforeDate, setBeforeDate] = useState('2024-06-01')
   const [afterDate, setAfterDate] = useState('2024-09-01')
   const [error, setError] = useState<string | null>(null)

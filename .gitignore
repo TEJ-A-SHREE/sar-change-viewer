@@ -12,10 +12,13 @@ Thumbs.db
 !.env.example
 
 # Large data never goes in git
-data/
+backend/data/
 *.tif
 *.tiff
 *.zip
 *.SAFE/
 *.nc
 *.h5
+
+# Launcher logs
+.logs/

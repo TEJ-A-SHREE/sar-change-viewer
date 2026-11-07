@@ -22,5 +22,5 @@ CHANGE_THRESHOLD_DB = float(os.environ.get("SAR_CHANGE_THRESHOLD_DB", "3.0"))
 
 # Comma-separated list of origins allowed to call the API (for production).
 CORS_ORIGINS = [
-    o for o in os.environ.get("SAR_CORS_ORIGINS", "http://localhost:5173").split(",") if o
+    o for o in os.environ.get("SAR_CORS_ORIGINS", "http://localhost:5174").split(",") if o
 ]

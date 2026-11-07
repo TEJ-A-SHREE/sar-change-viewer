@@ -19,13 +19,22 @@ pick an area + two dates  →  fetch Sentinel-1 scenes  →  compare them  →  
 ## Quick start
 
 ```bash
-make setup      # install frontend (npm) and backend (uv)
-make backend    # terminal 1: API on http://localhost:8000
-make frontend   # terminal 2: UI  on http://localhost:5173
+./start.sh      # installs anything missing, starts API + UI, opens the browser
 ```
 
-Open http://localhost:5173, press **Compare**, and you will see a synthetic result end to end.
-Real satellite data arrives when the fetch stage is implemented (see ARCHITECTURE).
+That is the only command most people need. Ctrl+C stops everything. On Windows,
+double-click `start.cmd` (needs WSL). Manual alternative:
+
+```bash
+make setup      # install frontend (npm) and backend (uv)
+make backend    # terminal 1: API on http://localhost:8000
+make frontend   # terminal 2: UI  on http://localhost:5174
+```
+
+The app opens on an interactive world map. Hover a continent, click it, pick a country with
+verified analyses (currently India), pick a state (currently Kerala), and open the analysis.
+The compare tool itself lives at `/compare`. Results are synthetic until the fetch stage is
+implemented (see ARCHITECTURE).
 
 ## Layout
 
@@ -40,4 +49,5 @@ scripts/    Helper scripts (contract check, GitHub publish)
 
 ## Status
 
-v0.1.0, scaffold with a working synthetic pipeline. Not an official NASA product.
+v0.2.0: scaffold with a working synthetic pipeline and the explore-map entry screen.
+Not an official NASA product.

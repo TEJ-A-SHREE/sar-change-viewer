@@ -6,7 +6,18 @@ Two halves: **using the app** (for anyone) and **fixing the setup** (for the tea
 
 ## Using the app
 
-### What am I looking at?
+### The first screen is a map. What do I do?
+
+Hover a continent and it lights up. Click it to open a panel listing its countries; the ones
+with a **Verified** tag have analyses ready. Click a country to zoom in and see its states,
+then click a highlighted state and press **Open analysis**. Press Esc or use the breadcrumb at
+the top-left to go back. Every level has a shareable address, e.g.
+`/?continent=Asia&country=IND&state=Kerala`.
+
+"Verified" means the data team has confirmed usable radar scenes for that place. Because
+NISAR / Sentinel-1 coverage is uneven, we only list places we are sure about.
+
+### What am I looking at in the compare tool?
 
 Radar satellites such as Sentinel-1 send a pulse at the ground and measure how much bounces
 back. Rough or hard things (buildings, rocky ground, choppy water) bounce a lot and show up
@@ -53,6 +64,14 @@ whole flow can be tested. Real data arrives when the fetch stage is implemented
 
 ## Fixing the setup
 
+### `./start.sh` says a port is busy
+
+Another program uses that port. `FRONTEND_PORT=5180 ./start.sh` or `BACKEND_PORT=8010 ./start.sh`.
+
+### `./start.sh`: permission denied
+
+`chmod +x start.sh` once, or run `bash start.sh`.
+
 ### `make: command not found`
 
 - Ubuntu / WSL: `sudo apt install make`
@@ -63,6 +82,13 @@ whole flow can be tested. Real data arrives when the fetch stage is implemented
 ### `uv: command not found`
 
 Install it: `curl -LsSf https://astral.sh/uv/install.sh | sh`, then open a new terminal.
+
+### The browser shows a completely different app at localhost:5174
+
+Another program on your computer is listening on that port. On WSL, Windows programs win
+over WSL ones for the same port, so the launcher's own check may not notice. Start on a
+different port: `FRONTEND_PORT=5180 ./start.sh`. (This is why the default is 5174 and not
+Vite's usual 5173: a Windows app on the first dev machine already used 5173.)
 
 ### Backend offline / "Backend offline · showing sample data"
 

@@ -27,11 +27,22 @@ make setup
 
 ## 3. Run it
 
-Two terminals:
+One command:
+
+```bash
+./start.sh
+```
+
+It installs missing dependencies, starts the API (port 8000) and the UI (port 5174), opens
+your browser, and stops both when you press Ctrl+C. Logs go to `.logs/`. Flags:
+`--no-open` (do not open a browser), `--mocks` (UI only, sample data). Change ports with
+`FRONTEND_PORT=5180 BACKEND_PORT=8010 ./start.sh`. Windows users: `start.cmd` runs it in WSL.
+
+Manual alternative, two terminals:
 
 ```bash
 make backend     # API at http://localhost:8000  (docs at http://localhost:8000/docs)
-make frontend    # UI  at http://localhost:5173
+make frontend    # UI  at http://localhost:5174
 ```
 
 The UI proxies every `/api/*` call to the backend, so no CORS setup is needed in development.
@@ -63,7 +74,9 @@ Fix formatting automatically with `make format`.
 
 | You are working on | Put code in | Entry point to change |
 |--------------------|-------------|-----------------------|
-| UI / UX | `frontend/src/components/`, `frontend/src/pages/` | `frontend/src/pages/ComparePage.tsx` |
+| Explore map (entry screen) | `frontend/src/pages/ExplorePage.tsx`, `frontend/src/components/map/` | `ExplorePage.tsx` |
+| Which places are "verified" | `frontend/src/data/coverage.ts` | add a state under its country |
+| Compare tool UI | `frontend/src/components/`, `frontend/src/pages/` | `frontend/src/pages/ComparePage.tsx` |
 | Downloading SAR scenes | `backend/app/sar/fetch.py` | implement `fetch_scene()` |
 | Filtering / change maths | `backend/app/sar/process.py` | `compute_change()` |
 | matplotlib images | `backend/app/sar/visualize.py` | `render_*()` |
@@ -74,7 +87,22 @@ Each `backend/app/sar/*.py` file has a header docstring stating its owner, its i
 output. Keep those functions pure (arrays in, arrays out) and they will plug straight into
 `backend/app/services/analysis.py`, which is the only file that calls all four stages.
 
-## 7. Switching from synthetic to real data
+## 7. Adding a newly verified region to the map
+
+1. Add the state under its country in `frontend/src/data/coverage.ts` (bbox, scene count,
+   latest scene date). Names must match Natural Earth names used in `frontend/public/data/`.
+2. Add a matching preset with the same `regionId` in `frontend/src/lib/regions.ts`.
+3. If the country has no state boundaries yet, regenerate the map data:
+
+   ```bash
+   # download the two Natural Earth files listed at the top of scripts/build_map_data.py, then
+   python3 -I scripts/build_map_data.py ne_110m_admin_0_countries.geojson \
+       ne_50m_admin_1_states_provinces.geojson --states=IND,USA
+   ```
+
+   Commit the regenerated files under `frontend/public/data/`; do not commit the downloads.
+
+## 8. Switching from synthetic to real data
 
 The backend runs in `synthetic` mode by default. Once `fetch_scene()` works:
 
@@ -85,7 +113,7 @@ SAR_DATA_MODE=live uv run uvicorn app.main:app --reload --port 8000
 
 All settings are environment variables listed in `backend/app/config.py`.
 
-## 8. Navigating versions
+## 9. Navigating versions
 
 Every release is a git tag. To see what the project looked like at a version:
 
@@ -98,7 +126,7 @@ git log --oneline       # every commit, newest first
 
 `CHANGELOG.md` is the human-readable version of the same history.
 
-## 9. Publishing to GitHub for the first time (maintainer only)
+## 10. Publishing to GitHub for the first time (maintainer only)
 
 ```bash
 gh auth login
