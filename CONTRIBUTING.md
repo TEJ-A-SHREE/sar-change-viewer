@@ -1,0 +1,142 @@
+# Contributing
+
+Everything a teammate needs to write code that merges cleanly. Read once; skim later.
+
+## Tech stack
+
+| Layer | Choice | Why |
+|-------|--------|-----|
+| UI | React 19 + TypeScript, built with Vite 8 | Fast dev loop, types catch contract drift. |
+| Styling | Tailwind CSS 4 with design tokens in `frontend/src/index.css` | One place for colours and fonts. No component CSS files. |
+| Lint / format (UI) | oxlint + Prettier | Zero-config, fast. |
+| API | FastAPI + Pydantic v2 | Validates the contract on every request; auto docs at `/docs`. |
+| Numerics | numpy, scipy | Arrays in, arrays out. |
+| Images | matplotlib (Agg backend) | What the team already uses. |
+| Python tooling | uv, ruff, pytest | One tool installs Python and deps; ruff lints and formats. |
+| CI | GitHub Actions (`.github/workflows/ci.yml`) | Lint, format check, tests, contract check on every PR. |
+
+Adding a dependency: `npm install <pkg>` in `frontend/`, or `uv add <pkg>` in `backend/`.
+Commit the lockfile (`package-lock.json` / `uv.lock`) with it. Say why in the PR.
+
+Geospatial libraries (rasterio, pyroSAR, asf_search, sentinelsat, etc.) go in `backend/` with
+`uv add`. Keep heavy ones optional if they are hard to install:
+`uv add --optional live rasterio`.
+
+## Repository layout and ownership
+
+```
+frontend/
+  src/
+    components/   One React component per file, PascalCase, no business logic
+    pages/        Screens that compose components (ComparePage.tsx)
+    lib/          Pure helpers: api.ts (only place that calls fetch), format.ts, regions.ts
+    types/        analysis.ts = TypeScript mirror of the contract
+    mocks/        Sample data used when the backend is offline
+backend/
+  app/
+    main.py       FastAPI app, middleware, error shape
+    config.py     All env-var settings
+    models.py     Pydantic mirror of the contract
+    api/          HTTP routes only, no logic
+    services/     analysis.py orchestrates the four stages
+    sar/
+      fetch.py      Stage 1  (data team)
+      process.py    Stage 2  (processing team)
+      visualize.py  Stage 3  (visualisation team)
+      analyze.py    Stage 4  (analysis team)
+  tests/          pytest; mirror the module name: test_process.py tests sar/process.py
+shared/contracts/ JSON Schema, the contract's source of truth
+docs/             Architecture, design brief
+```
+
+Rule of thumb: **stages never import each other, and never import FastAPI.** They take numpy
+arrays or dataclasses and return the same. `services/analysis.py` is the only glue.
+
+## File and naming conventions
+
+| Thing | Convention | Example |
+|-------|-----------|---------|
+| React component file | PascalCase `.tsx`, named export matching the file | `SummaryCard.tsx` exports `SummaryCard` |
+| Hook | `useThing.ts` in `lib/` | `useAnalysis.ts` |
+| TS helper module | camelCase `.ts` | `format.ts` |
+| Python module | snake_case | `process.py` |
+| Python function / variable | snake_case | `compute_change` |
+| Python class | PascalCase | `ChangeMap` |
+| JSON field on the wire | camelCase | `beforeDate` |
+| Constant | UPPER_SNAKE | `CHANGE_THRESHOLD_DB` |
+| Env var | `SAR_` prefix | `SAR_DATA_MODE` |
+| Test file | `test_<module>.py` | `test_analyze.py` |
+| Image output | `backend/outputs/<request-id>/<before|after|change>.png` | |
+
+Formatting is automated: `make format`. Do not hand-format.
+
+- TypeScript: no semicolons, single quotes, 100 columns (`.prettierrc`).
+- Python: ruff defaults, 100 columns, type hints on every public function, a docstring on
+  every module and public function saying **what goes in and what comes out**.
+- Colours: define once in `frontend/src/index.css` `@theme` and in `visualize.py` constants.
+  They must match; the legend in the UI is drawn from backend data.
+- Text shown to users: plain English, no acronyms without a gloss. "Radar" not "SAR
+  backscatter". Say what a pattern *usually* means.
+
+## Git workflow
+
+**Branches**
+
+```
+main                 always deployable; protected; merge via PR only
+<type>/<short-name>  your work, e.g. feat/asf-fetch, fix/date-validation, docs/help-faq
+```
+
+Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`.
+
+**Commits** follow [Conventional Commits](https://www.conventionalcommits.org):
+
+```
+<type>(<scope>): <imperative summary under 72 chars>
+
+Optional body: what and why, not how.
+```
+
+Scopes: `frontend`, `backend`, `fetch`, `process`, `visualize`, `analyze`, `contract`, `ci`, `docs`.
+
+```
+feat(fetch): download Sentinel-1 GRD scenes from ASF
+fix(frontend): reject after-date earlier than before-date
+docs(help): add Windows setup notes
+```
+
+**Pull requests**
+
+- One concern per PR. Small PRs merge fast.
+- Fill the template. Screenshots for UI changes.
+- CI green + one approval, then **Squash and merge**. The squash title becomes the commit
+  message on `main`, so make it a proper conventional commit line.
+- Delete the branch after merging.
+
+**Releases**
+
+1. Move items from `Unreleased` in `CHANGELOG.md` to a new version heading with today's date.
+2. Bump `version` in `frontend/package.json` and `backend/pyproject.toml`.
+3. `git tag -a v0.2.0 -m "v0.2.0"` on `main`, then `git push --tags`.
+
+Semantic versioning: breaking contract change → major; new feature → minor; fix → patch.
+
+## Changing the contract
+
+The contract is what lets four teams work independently. Changing it is allowed but
+deliberate:
+
+1. Edit `shared/contracts/analysis.schema.json`.
+2. Mirror the change in `frontend/src/types/analysis.ts` and `backend/app/models.py`.
+3. Bump `contractVersion` / `CONTRACT_VERSION` in all three (minor for additive, major for breaking).
+4. Update `frontend/src/mocks/mockAnalysis.ts` and `backend/tests/test_api.py`.
+5. One PR containing all of it, title `feat(contract): ...` or `feat(contract)!: ...` if breaking.
+
+`make contract` and CI fail if the three versions drift.
+
+## Definition of done
+
+- `make check` passes.
+- New behaviour has a test (backend) or a typed mock (frontend).
+- `CHANGELOG.md` has a line under Unreleased.
+- No data files, secrets or generated images committed.

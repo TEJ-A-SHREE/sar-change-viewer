@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+/* Design tokens. Change colours here, not in components. */
+@theme {
+  --color-space-950: #06080f;
+  --color-space-900: #0b1020;
+  --color-space-800: #131a2e;
+  --color-space-700: #1e2740;
+  --color-space-600: #2c3759;
+  --color-ink-100: #f3f5fb;
+  --color-ink-300: #b8c0d9;
+  --color-ink-500: #7d879f;
+  --color-signal-500: #4fd1c5; /* teal: "no change" / neutral */
+  --color-rise-500: #f6ad55; /* orange: increase (e.g. more water / brighter) */
+  --color-fall-500: #63b3ed; /* blue: decrease */
+  --color-alert-500: #fc8181; /* red: strong change */
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-space-950 text-ink-100 font-sans antialiased;
+}

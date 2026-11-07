@@ -1,0 +1,21 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Large data never goes in git
+data/
+*.tif
+*.tiff
+*.zip
+*.SAFE/
+*.nc
+*.h5

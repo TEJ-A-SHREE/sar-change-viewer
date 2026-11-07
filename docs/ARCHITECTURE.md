@@ -1,0 +1,86 @@
+# Architecture
+
+## One request, end to end
+
+```
+Browser (React)                      FastAPI                          app/sar/*
+──────────────                      ───────                          ─────────
+QueryForm ─► lib/api.analyze()
+              POST /api/analyze ──► api/routes.analyze()
+                                      └─► services/analysis.run_analysis()
+                                            1. fetch.fetch_scene(bbox, before)   ─┐  Scene (np array)
+                                               fetch.fetch_scene(bbox, after)    ─┘
+                                            2. process.compute_change(a, b)      ──  ChangeMap
+                                            3. visualize.render_backscatter() x2 ──  PNG files in outputs/<id>/
+                                               visualize.render_change()
+                                            4. analyze.explain(change)           ──  Summary, Findings, Stats
+                                      ◄── AnalysisResult (JSON, see shared/contracts)
+ComparePage renders ◄─────────────────
+  <img src="/outputs/<id>/change.png">  ──► StaticFiles mount serves the PNG
+```
+
+## The four stages
+
+| Stage | Module | Input | Output | State |
+|-------|--------|-------|--------|-------|
+| Fetch | `app/sar/fetch.py` | bbox, date, source | `Scene` (float32 intensity array + pixel size) | **Stub.** `synthetic_scene()` works; `fetch_scene()` raises `NotImplementedError`. |
+| Process | `app/sar/process.py` | two intensity arrays | `ChangeMap` (dB images, log-ratio, change masks) | Working: dB conversion, Lee filter, ±3 dB log-ratio threshold. |
+| Visualize | `app/sar/visualize.py` | arrays | PNG paths | Working: grey backscatter and three-class change map. |
+| Analyze | `app/sar/analyze.py` | `ChangeMap`, pixel size, area name | `Summary`, `Finding[]`, `Stats` | Working: rule-based plain-language text. |
+
+Each stage is a pure function over numpy arrays and small dataclasses. That is the integration
+rule: if your replacement keeps the same signature, nothing else needs to change.
+
+## Where real data plugs in
+
+`fetch_scene()` is the only missing piece between the current demo and real results. A working
+implementation needs to:
+
+1. Search a catalogue (ASF `asf_search`, or Copernicus Data Space) for the Sentinel-1 GRD scene
+   closest to the requested date that covers the bbox. Prefer the same relative orbit for both
+   dates so geometry matches.
+2. Download to `SAR_DATA_DIR` and cache by scene id.
+3. Read the VV band (rasterio), clip to the bbox, resample both dates to the same grid, and
+   return linear intensity as float32 with the pixel size in metres.
+
+Terrain correction and precise co-registration can come later; the log-ratio approach is
+forgiving for flat areas, which is where the first demos should be.
+
+## The contract
+
+`shared/contracts/analysis.schema.json` defines `AnalysisRequest`, `AnalysisResult` and
+`ApiError`. The frontend never reads anything that is not in the contract, and the backend
+never returns anything that is not in it. Every error, including validation, has the shape
+`{"error": {"code", "message"}}`, so the UI has one error path.
+
+Images are returned as URLs, not bytes, so the UI can lazy-load them and the backend can later
+move them to object storage without changing the contract.
+
+## Frontend structure
+
+`ComparePage` holds the only state machine: `idle → loading → ready | error`. Components are
+presentational and receive typed slices of `AnalysisResult`. `lib/api.ts` is the only file
+allowed to call `fetch`; it falls back to `mocks/mockAnalysis.ts` when the backend is
+unreachable and flags that in the result so the UI can say so honestly.
+
+## Settings
+
+All backend settings are environment variables read in `app/config.py`:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SAR_DATA_MODE` | `synthetic` | `live` to call `fetch_scene()` |
+| `SAR_OUTPUT_DIR` | `backend/outputs` | Where PNGs are written and served from |
+| `SAR_DATA_DIR` | `backend/data` | Scene cache |
+| `SAR_CHANGE_THRESHOLD_DB` | `3.0` | Change sensitivity |
+| `SAR_CORS_ORIGINS` | `http://localhost:5173` | Allowed browser origins in production |
+
+## Known limits of v0.1
+
+- Synthetic data only.
+- Output PNGs accumulate on disk; add a cleanup job or cache eviction before deploying.
+- Requests are synchronous. Real fetches take minutes, so the next step is a job queue:
+  `POST /api/analyze` returns a job id and the UI polls `GET /api/jobs/<id>`. The contract
+  already has an `id` field for this reason.
+- No map widget; the bbox is typed or chosen from presets. A Leaflet/MapLibre picker is the
+  obvious UI upgrade.
