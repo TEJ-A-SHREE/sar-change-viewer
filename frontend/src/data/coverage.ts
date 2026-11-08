@@ -2,7 +2,7 @@
  * Which places have VERIFIED SAR analyses ready.
  *
  * This is the single list the explore map reads. Add a state here only once
- * the data team has confirmed usable NISAR / Sentinel-1 scenes for it.
+ * the data team has confirmed usable NISAR scenes for it.
  * Continent and country names must match the `continent` / `name` properties
  * in /public/data/world.json (Natural Earth naming).
  */

@@ -3,7 +3,7 @@
   "$id": "https://github.com/sar-change-viewer/contracts/analysis.schema.json",
   "title": "SAR Change Viewer analysis contract",
   "description": "Source of truth for the request/response shape between frontend and backend. Mirrors: frontend/src/types/analysis.ts and backend/app/models.py. Bump contractVersion in all three when changing.",
-  "contractVersion": "1.0.0",
+  "contractVersion": "1.1.0",
   "$defs": {
     "BBox": {
       "type": "array",
@@ -27,7 +27,7 @@
         "area": { "$ref": "#/$defs/AreaOfInterest" },
         "beforeDate": { "type": "string", "format": "date" },
         "afterDate": { "type": "string", "format": "date" },
-        "source": { "type": "string", "enum": ["sentinel-1"], "default": "sentinel-1" }
+        "source": { "type": "string", "enum": ["nisar"], "default": "nisar" }
       }
     },
     "ImageAsset": {

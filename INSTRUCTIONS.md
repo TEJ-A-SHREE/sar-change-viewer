@@ -96,7 +96,7 @@ output. Keep those functions pure (arrays in, arrays out) and they will plug str
 
    ```bash
    # download the two Natural Earth files listed at the top of scripts/build_map_data.py, then
-   python3 -I scripts/build_map_data.py ne_110m_admin_0_countries.geojson \
+   python3 -I scripts/build_map_data.py ne_50m_admin_0_countries.geojson \
        ne_50m_admin_1_states_provinces.geojson --states=IND,USA
    ```
 

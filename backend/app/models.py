@@ -13,7 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-CONTRACT_VERSION = "1.0.0"
+CONTRACT_VERSION = "1.1.0"
 
 BBox = tuple[float, float, float, float]
 
@@ -46,7 +46,7 @@ class AnalysisRequest(_Camel):
     area: AreaOfInterest
     before_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
     after_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
-    source: Literal["sentinel-1"] = "sentinel-1"
+    source: Literal["nisar"] = "nisar"
 
     @field_validator("after_date")
     @classmethod

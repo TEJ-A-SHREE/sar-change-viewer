@@ -19,6 +19,8 @@ export type StateFeature = Feature<Geometry, StateProps>
 export type WorldData = FeatureCollection<Geometry, CountryProps>
 export type StatesData = FeatureCollection<Geometry, StateProps>
 
+export type Bounds = [[number, number], [number, number]]
+
 export function createProjection(): GeoProjection {
   return geoNaturalEarth1().fitExtent(
     [
@@ -33,6 +35,80 @@ export const pathFor = (projection: GeoProjection) => geoPath(projection)
 
 export const GRATICULE = geoGraticule10()
 
+/**
+ * Fixed lon/lat view boxes per continent: [[west, south], [east, north]].
+ *
+ * These are hand-set rather than derived from country extents, because
+ * territories such as Alaska's Aleutians or Fiji cross the antimeridian and
+ * would otherwise stretch a continent's zoom to the whole globe.
+ */
+export const CONTINENT_VIEWS: Record<string, Bounds> = {
+  'North America': [
+    [-168, 7],
+    [-52, 74],
+  ],
+  'South America': [
+    [-82, -56],
+    [-34, 13],
+  ],
+  Europe: [
+    [-25, 34],
+    [45, 72],
+  ],
+  Africa: [
+    [-18, -35],
+    [52, 38],
+  ],
+  Asia: [
+    [26, -11],
+    [150, 78],
+  ],
+  Oceania: [
+    [112, -48],
+    [180, -1],
+  ],
+}
+
+/** Where each continent's name sits on the world view. */
+export const CONTINENT_LABELS: { name: string; lon: number; lat: number }[] = [
+  { name: 'North America', lon: -103, lat: 47 },
+  { name: 'South America', lon: -60, lat: -16 },
+  { name: 'Europe', lon: 20, lat: 55 },
+  { name: 'Africa', lon: 18, lat: 6 },
+  { name: 'Asia', lon: 88, lat: 48 },
+  { name: 'Oceania', lon: 137, lat: -26 },
+]
+
+/** Project a lon/lat box to pixel bounds by sampling its edges (edges curve). */
+export function projectBox(projection: GeoProjection, box: Bounds, samples = 24): Bounds {
+  const [[w, s], [e, n]] = box
+  let x0 = Infinity
+  let y0 = Infinity
+  let x1 = -Infinity
+  let y1 = -Infinity
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples
+    const pts: [number, number][] = [
+      [w + (e - w) * t, s],
+      [w + (e - w) * t, n],
+      [w, s + (n - s) * t],
+      [e, s + (n - s) * t],
+    ]
+    for (const p of pts) {
+      const q = projection(p)
+      if (!q) continue
+      x0 = Math.min(x0, q[0])
+      y0 = Math.min(y0, q[1])
+      x1 = Math.max(x1, q[0])
+      y1 = Math.max(y1, q[1])
+    }
+  }
+  return [
+    [x0, y0],
+    [x1, y1],
+  ]
+}
+
 export interface ViewTransform {
   k: number
   x: number
@@ -42,10 +118,7 @@ export interface ViewTransform {
 export const IDENTITY: ViewTransform = { k: 1, x: 0, y: 0 }
 
 /** Zoom so that `bounds` (projected px) fills the map with some padding. */
-export function fitBounds(
-  bounds: [[number, number], [number, number]],
-  { padding = 0.18, maxZoom = 14 } = {},
-): ViewTransform {
+export function fitBounds(bounds: Bounds, { padding = 0.18, maxZoom = 14 } = {}): ViewTransform {
   const [[x0, y0], [x1, y1]] = bounds
   const w = Math.max(x1 - x0, 1)
   const h = Math.max(y1 - y0, 1)
@@ -55,9 +128,7 @@ export function fitBounds(
   return { k, x: MAP_W / 2 - k * cx, y: MAP_H / 2 - k * cy }
 }
 
-export function unionBounds(
-  boundsList: [[number, number], [number, number]][],
-): [[number, number], [number, number]] {
+export function unionBounds(boundsList: Bounds[]): Bounds {
   let x0 = Infinity
   let y0 = Infinity
   let x1 = -Infinity

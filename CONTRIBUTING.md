@@ -20,7 +20,7 @@ Everything a teammate needs to write code that merges cleanly. Read once; skim l
 Adding a dependency: `npm install <pkg>` in `frontend/`, or `uv add <pkg>` in `backend/`.
 Commit the lockfile (`package-lock.json` / `uv.lock`) with it. Say why in the PR.
 
-Geospatial libraries (rasterio, pyroSAR, asf_search, sentinelsat, etc.) go in `backend/` with
+Geospatial libraries (rasterio, h5py, asf_search, etc.) go in `backend/` with
 `uv add`. Keep heavy ones optional if they are hard to install:
 `uv add --optional live rasterio`.
 
@@ -107,7 +107,7 @@ Optional body: what and why, not how.
 Scopes: `frontend`, `backend`, `fetch`, `process`, `visualize`, `analyze`, `contract`, `ci`, `docs`.
 
 ```
-feat(fetch): download Sentinel-1 GRD scenes from ASF
+feat(fetch): download NISAR GCOV granules from ASF
 fix(frontend): reject after-date earlier than before-date
 docs(help): add Windows setup notes
 ```

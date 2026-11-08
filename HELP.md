@@ -15,11 +15,11 @@ the top-left to go back. Every level has a shareable address, e.g.
 `/?continent=Asia&country=IND&state=Kerala`.
 
 "Verified" means the data team has confirmed usable radar scenes for that place. Because
-NISAR / Sentinel-1 coverage is uneven, we only list places we are sure about.
+NISAR coverage is still being built up, we only list places we are sure about.
 
 ### What am I looking at in the compare tool?
 
-Radar satellites such as Sentinel-1 send a pulse at the ground and measure how much bounces
+NISAR, the NASA-ISRO radar satellite, sends a pulse at the ground and measure how much bounces
 back. Rough or hard things (buildings, rocky ground, choppy water) bounce a lot and show up
 **bright**. Smooth things (calm water, flat bare soil, roads) bounce the signal away and show
 up **dark**. Unlike a camera, radar works through clouds and at night, which is why it is used

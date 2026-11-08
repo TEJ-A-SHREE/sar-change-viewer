@@ -36,11 +36,11 @@ rule: if your replacement keeps the same signature, nothing else needs to change
 `fetch_scene()` is the only missing piece between the current demo and real results. A working
 implementation needs to:
 
-1. Search a catalogue (ASF `asf_search`, or Copernicus Data Space) for the Sentinel-1 GRD scene
-   closest to the requested date that covers the bbox. Prefer the same relative orbit for both
-   dates so geometry matches.
+1. Search the NASA ASF DAAC (`asf_search`, dataset NISAR) for the L2 GCOV granule closest to
+   the requested date that covers the bbox. NISAR repeats every 12 days; prefer the same track
+   and frame for both dates so geometry matches.
 2. Download to `SAR_DATA_DIR` and cache by scene id.
-3. Read the VV band (rasterio), clip to the bbox, resample both dates to the same grid, and
+3. Read the HH backscatter layer from the HDF5 granule, clip to the bbox, resample both dates to the same grid, and
    return linear intensity as float32 with the pixel size in metres.
 
 Terrain correction and precise co-registration can come later; the log-ratio approach is

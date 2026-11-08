@@ -84,7 +84,7 @@ export function ComparePage() {
         )}
       </main>
       <footer className="border-t border-space-700 py-4 text-center text-xs text-ink-500">
-        Built on open Sentinel-1 radar data. Not an official NASA product.
+        Built on NISAR L-band radar data from NASA and ISRO. Not an official NASA product.
       </footer>
     </div>
   )

@@ -9,10 +9,14 @@ array of linear backscatter intensity (not dB) for the requested bounding box,
 plus the pixel size in metres. Rows are north-to-south, columns west-to-east.
 
 Suggested real implementation (not done yet):
-  * Search ASF (https://search.asf.alaska.edu) or Copernicus Data Space for a
-    Sentinel-1 GRD scene nearest to `date` that covers `bbox`.
-  * Download it to `app.config.DATA_DIR` (cache by scene id).
-  * Read the VV band with rasterio, clip to `bbox`, and return the array.
+  * Search the NASA ASF DAAC (https://search.asf.alaska.edu, `asf_search`
+    dataset NISAR) for the L2 GCOV granule nearest to `date` that covers
+    `bbox`. GCOV is geocoded, radiometrically terrain-corrected backscatter,
+    so no extra terrain correction is needed for a first version.
+  * Download it to `app.config.DATA_DIR` (cache by granule id). Granules are
+    HDF5; read them with h5py or rasterio's HDF5 driver.
+  * Read the HH backscatter layer (L-band, 24 cm wavelength), clip to `bbox`,
+    and return the array.
 
 Until then, `synthetic_scene()` fabricates something plausible so the rest of
 the pipeline can run.
@@ -33,11 +37,11 @@ class Scene:
     pixel_size_m: float
     bbox: BBox
     date: str
-    satellite: str = "Sentinel-1"
-    polarization: str = "VV"
+    satellite: str = "NISAR"
+    polarization: str = "HH"
 
 
-def fetch_scene(bbox: BBox, date: str, source: str = "sentinel-1") -> Scene:
+def fetch_scene(bbox: BBox, date: str, source: str = "nisar") -> Scene:
     """Fetch a real scene. Not implemented yet; see module docstring."""
     raise NotImplementedError(
         "Live SAR fetching is not wired up yet. Set SAR_DATA_MODE=synthetic or implement "

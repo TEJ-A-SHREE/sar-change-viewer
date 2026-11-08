@@ -1,10 +1,10 @@
 # SAR Change Viewer
 
-See how a patch of the Earth changed between two dates using satellite radar (SAR) data, with
+See how a patch of the Earth changed between two dates using NISAR satellite radar (SAR) data, with
 the result explained in plain language for people who are not remote-sensing experts.
 
 ```
-pick an area + two dates  →  fetch Sentinel-1 scenes  →  compare them  →  render images  →  explain in words
+pick an area + two dates  →  fetch NISAR scenes  →  compare them  →  render images  →  explain in words
 ```
 
 | Doc | Read it when |
@@ -49,5 +49,5 @@ scripts/    Helper scripts (contract check, GitHub publish)
 
 ## Status
 
-v0.2.0: scaffold with a working synthetic pipeline and the explore-map entry screen.
+v0.2.0 plus unreleased: synthetic pipeline, space-themed explore map, NISAR as the only source.
 Not an official NASA product.

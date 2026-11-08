@@ -63,8 +63,8 @@ export function mockAnalysis(request: AnalysisRequest): AnalysisResult {
       decreaseKm2: 180,
     },
     metadata: {
-      satellite: 'Sentinel-1 (mock)',
-      polarization: 'VV',
+      satellite: 'NISAR (mock)',
+      polarization: 'HH',
       processingSteps: [
         'Fetched two scenes covering the area',
         'Converted radar intensity to decibels',

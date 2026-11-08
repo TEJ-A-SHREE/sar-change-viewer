@@ -49,7 +49,7 @@ export function QueryForm({ busy, initialRegionId, onSubmit }: Props) {
       area: { name: presetIndex >= 0 ? PRESET_REGIONS[presetIndex].name : undefined, bbox },
       beforeDate,
       afterDate,
-      source: 'sentinel-1',
+      source: 'nisar',
     })
   }
 

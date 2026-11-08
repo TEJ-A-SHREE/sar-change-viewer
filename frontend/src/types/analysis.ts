@@ -8,7 +8,7 @@
  * `CONTRACT_VERSION` in all three.
  */
 
-export const CONTRACT_VERSION = '1.0.0'
+export const CONTRACT_VERSION = '1.1.0'
 
 /** [minLon, minLat, maxLon, maxLat] in WGS84 degrees. */
 export type BBox = [number, number, number, number]
@@ -25,8 +25,8 @@ export interface AnalysisRequest {
   beforeDate: string
   /** ISO 8601 date, e.g. "2024-09-01". */
   afterDate: string
-  /** Which satellite mission to pull from. Only Sentinel-1 for now. */
-  source?: 'sentinel-1'
+  /** Which satellite mission to pull from. NISAR (NASA-ISRO SAR) only. */
+  source?: 'nisar'
 }
 
 export interface ImageAsset {

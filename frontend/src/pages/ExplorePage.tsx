@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { WorldMap, type Focus } from '../components/map/WorldMap'
 import { HudPanel, type HudItem } from '../components/map/HudPanel'
+import { Starfield } from '../components/map/Starfield'
 import { COVERAGE, CONTINENTS, countriesIn, findCountry, type Continent } from '../data/coverage'
 import { loadJson, type StatesData, type WorldData } from '../lib/geo'
 
 /**
- * Game-like entry screen: hover a continent, click to open it, pick a country
- * with verified analyses, then a state, then jump into the compare tool.
+ * Entry screen: a night-side Earth in a starfield. Hover a continent, click to
+ * open it, pick a country with verified analyses, then a state, then jump into
+ * the compare tool.
  */
 export function ExplorePage() {
   const navigate = useNavigate()
@@ -130,7 +132,7 @@ export function ExplorePage() {
         <button
           type="button"
           onClick={() => navigate(`/compare?region=${state.regionId}`)}
-          className="rounded-md bg-signal-500 px-4 py-1.5 font-mono text-xs font-semibold uppercase tracking-widest text-space-950 hover:brightness-110"
+          className="rounded-full bg-signal-500 px-4 py-1.5 font-mono text-xs font-semibold tracking-widest text-space-950 uppercase hover:brightness-110"
         >
           Open analysis →
         </button>
@@ -202,25 +204,29 @@ export function ExplorePage() {
 
   return (
     <div
-      className="explore-bg relative h-screen w-screen overflow-hidden"
+      className="space-bg relative h-screen w-screen overflow-hidden"
       onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
       onClick={() => focus.continent && !focus.iso3 && setFocus({})}
     >
-      <div className="scanlines pointer-events-none absolute inset-0" aria-hidden />
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <Starfield />
+      </div>
+      <div className="space-vignette pointer-events-none absolute inset-0" aria-hidden />
 
       {/* Top bar */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-5">
         <div className="pointer-events-auto">
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-signal-500/80">
+          <p className="flex items-center gap-2 font-mono text-[10px] tracking-[0.35em] text-ink-500 uppercase">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-signal-500" aria-hidden />
             SAR Change Viewer
           </p>
           <nav
-            className="mt-1 flex flex-wrap items-center gap-2 font-mono text-sm uppercase tracking-widest"
+            className="mt-1.5 flex flex-wrap items-center gap-2 font-mono text-sm tracking-widest uppercase"
             aria-label="Breadcrumb"
           >
             {crumbs.map((c, i) => (
               <span key={c.label} className="flex items-center gap-2">
-                {i > 0 && <span className="text-ink-500">/</span>}
+                {i > 0 && <span className="text-ink-500/60">/</span>}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -237,15 +243,16 @@ export function ExplorePage() {
             ))}
           </nav>
         </div>
-        <div className="pointer-events-auto flex items-center gap-4 font-mono text-xs uppercase tracking-widest">
+        {/* Mission strip: the instrument this map is about, in its own units. */}
+        <p className="hidden pt-2.5 font-mono text-[10px] tracking-[0.25em] text-ink-500/80 uppercase xl:block">
+          NISAR · NASA + ISRO · L-band 24 cm · 12-day repeat · 747 km orbit
+        </p>
+        <div className="pointer-events-auto flex items-center gap-3 font-mono text-xs tracking-widest uppercase">
           <span className="hidden text-ink-500 sm:inline">
             <span className="text-signal-500">{verifiedCount}</span> verified region
             {verifiedCount === 1 ? '' : 's'}
           </span>
-          <Link
-            to="/compare"
-            className="rounded-sm border border-signal-500/40 px-3 py-1.5 text-signal-500 hover:bg-signal-500/10"
-          >
+          <Link to="/compare" className="pill">
             Compare tool
           </Link>
         </div>
@@ -257,7 +264,7 @@ export function ExplorePage() {
       >
         {loadError && <p className="text-alert-500">{loadError}</p>}
         {!world && !loadError && (
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-ink-500">Loading map…</p>
+          <p className="font-mono text-xs tracking-[0.3em] text-ink-500 uppercase">Loading map…</p>
         )}
         {world && (
           <WorldMap
@@ -281,7 +288,7 @@ export function ExplorePage() {
       {/* Cursor label */}
       {hoverLabel && (
         <div
-          className="pointer-events-none fixed z-30 -translate-y-full rounded-sm border border-signal-500/50 bg-space-950/80 px-2 py-1 font-mono text-xs uppercase tracking-widest text-signal-500 backdrop-blur"
+          className="pointer-events-none fixed z-30 -translate-y-full rounded-full border border-signal-500/40 bg-space-950/75 px-2.5 py-1 font-mono text-[11px] tracking-widest text-signal-500 uppercase backdrop-blur"
           style={{ left: cursor.x + 14, top: cursor.y - 10 }}
         >
           {hoverLabel}
@@ -290,7 +297,7 @@ export function ExplorePage() {
 
       {/* Toast */}
       {toast && (
-        <div className="pointer-events-none absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-sm border border-rise-500/50 bg-space-950/80 px-4 py-2 font-mono text-xs uppercase tracking-widest text-rise-500 backdrop-blur">
+        <div className="pointer-events-none absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-full border border-rise-500/40 bg-space-950/80 px-4 py-2 font-mono text-xs tracking-widest text-rise-500 uppercase backdrop-blur">
           {toast}
         </div>
       )}
@@ -315,7 +322,7 @@ export function ExplorePage() {
       </div>
 
       {/* Hint */}
-      <p className="pointer-events-none absolute bottom-5 left-5 z-20 font-mono text-[11px] uppercase tracking-[0.25em] text-ink-500">
+      <p className="pointer-events-none absolute bottom-5 left-5 z-20 font-mono text-[11px] tracking-[0.25em] text-ink-500 uppercase">
         {!focus.continent && 'Hover a continent · click to open'}
         {focus.continent && !focus.iso3 && 'Pick a highlighted country · esc to go back'}
         {focus.iso3 && !focus.stateName && 'Pick a highlighted state · esc to go back'}
@@ -323,20 +330,17 @@ export function ExplorePage() {
       </p>
 
       {/* Continent quick-select for keyboards / small screens */}
-      <div className="pointer-events-auto absolute bottom-5 right-5 z-20 hidden gap-1 md:flex">
+      <div className="pointer-events-auto absolute right-5 bottom-5 z-20 hidden gap-1.5 md:flex">
         {CONTINENTS.map((c) => (
           <button
             key={c}
             type="button"
+            aria-pressed={focus.continent === c}
             onClick={(e) => {
               e.stopPropagation()
               setFocus({ continent: c })
             }}
-            className={`rounded-sm border px-2 py-1 font-mono text-[10px] uppercase tracking-widest transition ${
-              focus.continent === c
-                ? 'border-signal-500 text-signal-500'
-                : 'border-space-600 text-ink-500 hover:border-signal-500/50 hover:text-ink-300'
-            }`}
+            className="pill"
           >
             {c}
           </button>

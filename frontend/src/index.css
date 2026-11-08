@@ -1,16 +1,17 @@
 @import 'tailwindcss';
 
-/* Design tokens. Change colours here, not in components. */
+/* Design tokens. Change colours here, not in components.
+   Dark-only by design: the app is a night-side view of the Earth. */
 @theme {
-  --color-space-950: #06080f;
-  --color-space-900: #0b1020;
-  --color-space-800: #131a2e;
-  --color-space-700: #1e2740;
-  --color-space-600: #2c3759;
-  --color-ink-100: #f3f5fb;
-  --color-ink-300: #b8c0d9;
-  --color-ink-500: #7d879f;
-  --color-signal-500: #4fd1c5; /* teal: "no change" / neutral */
+  --color-space-950: #04060c; /* the void */
+  --color-space-900: #0a0f1e;
+  --color-space-800: #121a2e;
+  --color-space-700: #1c2640;
+  --color-space-600: #2a3656;
+  --color-ink-100: #eef1fb; /* starlight white */
+  --color-ink-300: #b4bcd6;
+  --color-ink-500: #7a8399;
+  --color-signal-500: #4fd1c5; /* teal: "no change" / neutral, and the UI accent */
   --color-rise-500: #f6ad55; /* orange: increase (e.g. more water / brighter) */
   --color-fall-500: #63b3ed; /* blue: decrease */
   --color-alert-500: #fc8181; /* red: strong change */
@@ -26,99 +27,105 @@ body,
 
 body {
   @apply bg-space-950 text-ink-100 font-sans antialiased;
+  color-scheme: dark;
 }
 
-/* ---- Explore page: techy / edgy chrome ---------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-signal-500);
+  outline-offset: 2px;
+}
 
-.explore-bg {
+/* ---- Explore page: deep space ------------------------------------------ */
+
+/* Faint nebulae behind the starfield. Two broad washes, nothing more. */
+.space-bg {
   background:
-    radial-gradient(ellipse at 50% 40%, #0c1428 0%, #06080f 65%),
-    linear-gradient(#4fd1c5 1px, transparent 1px) 0 0 / 48px 48px,
-    linear-gradient(90deg, #4fd1c5 1px, transparent 1px) 0 0 / 48px 48px;
-  background-blend-mode: normal, overlay, overlay;
-}
-.explore-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(79, 209, 197, 0.045) 1px, transparent 1px) 0 0 / 48px 48px,
-    linear-gradient(90deg, rgba(79, 209, 197, 0.045) 1px, transparent 1px) 0 0 / 48px 48px;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-  pointer-events: none;
+    radial-gradient(60% 55% at 78% 20%, rgba(79, 209, 197, 0.07) 0%, transparent 70%),
+    radial-gradient(55% 60% at 18% 85%, rgba(99, 90, 200, 0.12) 0%, transparent 70%),
+    radial-gradient(90% 80% at 50% 50%, #080c18 0%, #04060c 100%);
 }
 
-.scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.18) 0px,
-    rgba(0, 0, 0, 0.18) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  mix-blend-mode: multiply;
-  opacity: 0.6;
+/* Vignette so the chrome at the edges sits on a darker ground than the map. */
+.space-vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(4, 6, 12, 0.75) 100%);
 }
 
 .hud-panel {
   position: relative;
-  border: 1px solid rgba(79, 209, 197, 0.3);
-  background: rgba(11, 16, 32, 0.55);
-  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(180, 188, 214, 0.14);
+  border-radius: 12px;
+  background: rgba(10, 15, 30, 0.6);
+  backdrop-filter: blur(18px) saturate(130%);
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 0 40px rgba(79, 209, 197, 0.04);
-  clip-path: polygon(
-    0 0,
-    calc(100% - 14px) 0,
-    100% 14px,
-    100% 100%,
-    14px 100%,
-    0 calc(100% - 14px)
-  );
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(238, 241, 251, 0.07);
 }
-.hud-corner {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-color: #4fd1c5;
-  border-style: solid;
-  border-width: 0;
-  pointer-events: none;
+
+.hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem 0.15rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-.hud-corner-tl {
-  top: -1px;
-  left: -1px;
-  border-top-width: 2px;
-  border-left-width: 2px;
+.hud-chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
 }
-.hud-corner-tr {
-  top: -1px;
-  right: 13px;
-  border-top-width: 2px;
+
+/* Pill buttons used for the continent quick-select and small actions. */
+.pill {
+  border: 1px solid rgba(180, 188, 214, 0.16);
+  border-radius: 999px;
+  background: rgba(10, 15, 30, 0.55);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-300);
+  padding: 0.4rem 0.8rem;
+  transition:
+    color 160ms,
+    border-color 160ms,
+    background-color 160ms;
 }
-.hud-corner-bl {
-  bottom: -1px;
-  left: 13px;
-  border-bottom-width: 2px;
+.pill:hover {
+  color: var(--color-ink-100);
+  border-color: rgba(79, 209, 197, 0.5);
 }
-.hud-corner-br {
-  bottom: -1px;
-  right: -1px;
-  border-bottom-width: 2px;
-  border-right-width: 2px;
+.pill[aria-pressed='true'] {
+  color: var(--color-signal-500);
+  border-color: rgba(79, 209, 197, 0.7);
+  background: rgba(79, 209, 197, 0.1);
 }
 
 @keyframes map-pulse {
   0%,
   100% {
-    stroke-opacity: 0.5;
+    stroke-opacity: 0.45;
   }
   50% {
     stroke-opacity: 1;
   }
 }
 .map-pulse {
-  animation: map-pulse 1.6s ease-in-out infinite;
+  animation: map-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-pulse {
+    animation: none;
+    stroke-opacity: 0.9;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

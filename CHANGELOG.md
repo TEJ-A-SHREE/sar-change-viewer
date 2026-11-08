@@ -5,6 +5,21 @@ and each release is a git tag (`git tag` to list, `git checkout v0.1.0` to look 
 
 ## Unreleased
 
+### Changed
+- Data source is NISAR (NASA-ISRO SAR, L-band) everywhere: docs, the `source` enum in the
+  contract (`nisar`, contract 1.1.0), the fetch-stage notes (ASF DAAC, L2 GCOV, HH), and UI text.
+  The Sentinel-1 fallback is gone.
+- Explore map rebuilt from Natural Earth 50m with correct continents: Russia split at the
+  Urals into European and Asian parts, French Guiana / Réunion / Caribbean islands / Hawaii
+  moved to the continent they sit on, sub-Antarctic islands dropped. Each continent zooms to a
+  fixed view box instead of the union of its countries, so Europe and Oceania no longer zoom
+  to the whole globe.
+- Explore screen redesigned as deep space: canvas starfield with twinkle and cursor parallax,
+  atmosphere halo on the globe, continent labels, NISAR orbit track, quieter glass panel.
+  The grid, scanlines and bracket corners are gone. Honours `prefers-reduced-motion`.
+- `scripts/build_map_data.py` simplifies coastlines (Douglas–Peucker, 0.02°) and documents
+  the continent fixes.
+
 ## 0.2.0 — 2026-11-07
 
 ### Added
